@@ -44,23 +44,4 @@ jobs:
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/yt-backend:${{ env.BACKEND_TAG }} .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/yt-backend:${{ env.BACKEND_TAG }}
-
-      # 6️⃣ Send Gmail Notification
-      - name: Send Gmail Notification
-        if: success()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 587
-          username: ${{ secrets.GMAIL_USERNAME }}
-          password: ${{ secrets.GMAIL_APP_PASSWORD }}
-          subject: "✅ Frontend & Backend Deployment Successful"
-          to: ${{ secrets.GMAIL_USERNAME }}
-          from: GitHub Actions <${{ secrets.GMAIL_USERNAME }}>
-          body: |
-            🎉 Frontend & Backend Deployment Successfully!
-            Repository: ${{ github.repository }}
-            Branch: main
-            Commit: ${{ github.sha }}
-            Frontend Docker Tag: ${{ env.FRONTEND_TAG }}
-            Backend Docker Tag: ${{ env.BACKEND_TAG }}
+    
