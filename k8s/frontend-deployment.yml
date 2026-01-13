@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  namespace: yt
+  labels:
+    app: yt-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yt-frontend
+  template:
+    metadata:
+      labels:
+        app: yt-frontend
+    spec:
+      containers:
+        - name: yt-frontend
+          image: siddhartha54/yt-frontend:latest
+          ports:
+            - containerPort: 80

@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: yt
+  labels:
+    app: yt-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yt-backend
+  template:
+    metadata:
+      labels:
+        app: yt-backend
+    spec:
+      containers:
+        - name: yt-backend
+          image: siddhartha54/yt-backend:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: MONGO_URI
+              value: "mongodb://mongo:27017/youtube"
