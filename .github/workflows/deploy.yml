@@ -20,11 +20,11 @@ jobs:
 
       - name: Update frontend deployment image
         run: |
-          sed -i "s#image: siddhakal/frontend:.*#image: siddhakal/frontend:${FRONTEND_TAG}#g" k8s/frontend-deployment.yaml
+          sed -i "s#image: siddhakal/frontend:.*#image: siddhakal/frontend:${FRONTEND_TAG}#g" k8s/frontend-deployment.yml
 
       - name: Update backend deployment image
         run: |
-          sed -i "s#image: siddhakal/backend:.*#image: siddhakal/backend:${BACKEND_TAG}#g" k8s/backend-deployment.yaml
+          sed -i "s#image: siddhakal/backend:.*#image: siddhakal/backend:${BACKEND_TAG}#g" k8s/backend-deployment.yml
 
       - name: Apply to Kubernetes
         env:
