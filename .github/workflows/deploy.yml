@@ -1,0 +1,38 @@
+name: Deploy to Kubernetes
+
+on:
+  workflow_run:
+    workflows: ["Frontend CI/CD (Docker Hub)"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set variables
+        run: |
+          FRONTEND_TAG=${{ github.event.workflow_run.head_commit.message }}
+          BACKEND_TAG=${{ github.event.workflow_run.head_commit.message }}
+          echo "FRONTEND_TAG=$FRONTEND_TAG" >> $GITHUB_ENV
+          echo "BACKEND_TAG=$BACKEND_TAG" >> $GITHUB_ENV
+
+      - name: Update frontend deployment image
+        run: |
+          sed -i "s#image: siddhakal/frontend:.*#image: siddhakal/frontend:${FRONTEND_TAG}#g" k8s/frontend-deployment.yaml
+
+      - name: Update backend deployment image
+        run: |
+          sed -i "s#image: siddhakal/backend:.*#image: siddhakal/backend:${BACKEND_TAG}#g" k8s/backend-deployment.yaml
+
+      - name: Apply to Kubernetes
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+        run: |
+          kubectl apply -f k8s/frontend-deployment.yaml
+          kubectl apply -f k8s/backend-deployment.yaml
