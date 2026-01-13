@@ -3,11 +3,32 @@ import { useParams } from 'react-router-dom'
 import { api } from '../services/api'
 
 function VideoPlayer({url}){
+  const [error, setError] = useState(false);
+
   return (
     <div className="bg-black rounded-xl overflow-hidden aspect-video">
-      <video controls className="w-full h-full">
-        <source src={url} />
-      </video>
+      {error ? (
+        <div className="w-full h-full flex items-center justify-center text-white text-center p-4">
+          <div>
+            <div className="text-3xl mb-2">⚠️</div>
+            <p>Video cannot be played</p>
+            <p className="text-sm text-gray-400 mt-2">The video URL may not be accessible or in an unsupported format.</p>
+            <p className="text-xs text-gray-500 mt-4 break-all">{url}</p>
+          </div>
+        </div>
+      ) : (
+        <video 
+          controls 
+          className="w-full h-full"
+          onError={() => setError(true)}
+          crossOrigin="anonymous"
+        >
+          <source src={url} type="video/mp4" />
+          <source src={url} type="video/webm" />
+          <source src={url} type="video/ogg" />
+          Your browser does not support the video tag.
+        </video>
+      )}
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 export default function Sidebar(){
   const items = [
@@ -11,6 +12,13 @@ export default function Sidebar(){
 
   return (
     <aside className="w-64 p-4 hidden md:block bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 overflow-y-auto h-screen sticky top-0">
+      <Link 
+        to="/upload"
+        className="w-full mb-4 px-3 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center gap-3 text-sm font-medium justify-center"
+      >
+        📤 Upload
+      </Link>
+      <hr className="my-4 border-gray-200 dark:border-gray-800" />
       <ul className="space-y-1">
         {items.map((item) => (
           <li key={item.label}>

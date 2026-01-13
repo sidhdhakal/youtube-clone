@@ -2,6 +2,7 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import VideoPage from './pages/VideoPage'
+import Upload from './pages/Upload'
 import Header from './components/Header'
 
 export default function App(){
@@ -11,6 +12,7 @@ export default function App(){
       <Routes>
         <Route path="/" element={<Home/>} />
         <Route path="/video/:id" element={<VideoPage/>} />
+        <Route path="/upload" element={<Upload/>} />
       </Routes>
     </div>
   )
