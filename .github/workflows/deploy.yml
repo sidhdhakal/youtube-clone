@@ -1,8 +1,6 @@
-name: Deploy to Kubernetes
-
 on:
   workflow_run:
-    workflows: ["Frontend CI/CD (Docker Hub)"]
+    workflows: ["Frontend & Backend CI/CD (Docker Hub)"]
     types:
       - completed
 
@@ -15,12 +13,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set variables
+      - name: Get Docker Tags from previous workflow
         run: |
-          FRONTEND_TAG=${{ github.event.workflow_run.head_commit.message }}
-          BACKEND_TAG=${{ github.event.workflow_run.head_commit.message }}
-          echo "FRONTEND_TAG=$FRONTEND_TAG" >> $GITHUB_ENV
-          echo "BACKEND_TAG=$BACKEND_TAG" >> $GITHUB_ENV
+          echo "FRONTEND_TAG=${{ github.event.workflow_run.outputs.frontend_tag }}" >> $GITHUB_ENV
+          echo "BACKEND_TAG=${{ github.event.workflow_run.outputs.backend_tag }}" >> $GITHUB_ENV
 
       - name: Update frontend deployment image
         run: |
