@@ -40,4 +40,4 @@ jobs:
             sed -i "s#image: siddhartha54/yt-backend:.*#image: siddhartha54/yt-backend:${BACKEND_TAG}#g" backend-deployment.yml
 
             # Apply all manifests
-            kubectl apply -f .
+            sudo kubectl apply -f .
