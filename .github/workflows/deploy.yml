@@ -1,5 +1,6 @@
 name: Deploy to EC2 (Kubernetes)
 
+# Trigger when the build workflow completes successfully
 on:
   workflow_run:
     workflows: ["Frontend & Backend CI/CD (Docker Hub)"]
@@ -12,9 +13,11 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
+      # 1️⃣ Checkout repository
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # 2️⃣ Get Docker tags from the build workflow
       - name: Get Docker Tags from previous workflow
         run: |
           echo "FRONTEND_TAG=${{ github.event.workflow_run.outputs.frontend_tag }}" >> $GITHUB_ENV
@@ -22,22 +25,50 @@ jobs:
           echo "Frontend tag: $FRONTEND_TAG"
           echo "Backend tag: $BACKEND_TAG"
 
+      # 3️⃣ Deploy to EC2 and update Kubernetes
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }} # EC2 Public IP
           username: ${{ secrets.EC2_USER }} # e.g., ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }} # Private key in GitHub Secrets
+          key: ${{ secrets.EC2_SSH_KEY }} # Private key stored in GitHub Secrets
           port: 22
           script: |
-            # Go to k8s folder
-            cd /home/ubuntu/k8s
+            echo "Deploying Frontend and Backend to Kubernetes..."
 
-            # Update frontend deployment image with tag from build workflow
-            sed -i "s#image: siddhartha54/yt-frontend:.*#image: siddhartha54/yt-frontend:${FRONTEND_TAG}#g" frontend-deployment.yml
+            # Go to k8s folder on EC2
+            cd /home/ubuntu/k8s || exit 1
 
-            # Update backend deployment image with tag from build workflow
-            sed -i "s#image: siddhartha54/yt-backend:.*#image: siddhartha54/yt-backend:${BACKEND_TAG}#g" backend-deployment.yml
+            # Backup YAMLs just in case
+            cp frontend-deployment.yml frontend-deployment.yml.bak
+            cp backend-deployment.yml backend-deployment.yml.bak
 
-            # Apply all manifests
+            # Update frontend image tag (quotes added for YAML safety)
+            sed -i "s#image: siddhartha54/yt-frontend:.*#image: \"siddhartha54/yt-frontend:${FRONTEND_TAG}\"#g" frontend-deployment.yml
+
+            # Update backend image tag (quotes added for YAML safety)
+            sed -i "s#image: siddhartha54/yt-backend:.*#image: \"siddhartha54/yt-backend:${BACKEND_TAG}\"#g" backend-deployment.yml
+
+            # Ensure kubeconfig is available (adjust path if needed)
+            export KUBECONFIG=$HOME/.kube/config
+
+            # Dry-run first to validate YAML
+            kubectl apply --dry-run=client -f frontend-deployment.yml
+            kubectl apply --dry-run=client -f backend-deployment.yml
+
+            # Apply the manifests
             sudo kubectl apply -f .
+
+            echo "Deployment finished successfully!"
+
+        # Optional SSH settings
+        sync: false
+        use_insecure_cipher: false
+        timeout: 30s
+        command_timeout: 10m
+        debug: true
+
+        # Pass the tags as env variables to the SSH session
+        env:
+          FRONTEND_TAG: ${{ github.event.workflow_run.outputs.frontend_tag }}
+          BACKEND_TAG: ${{ github.event.workflow_run.outputs.backend_tag }}
