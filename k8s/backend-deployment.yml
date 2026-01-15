@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: yt-backend
-          image: siddhartha54/yt-backend:latest
+          image: siddhartha54/yt-backend:v.59
           ports:
             - containerPort: 5000
           env:

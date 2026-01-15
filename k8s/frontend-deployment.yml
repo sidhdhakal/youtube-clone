@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
         - name: yt-frontend
-          image: siddhartha54/yt-frontend:latest
+          image: siddhartha54/yt-frontend:v.19
           ports:
             - containerPort: 80
