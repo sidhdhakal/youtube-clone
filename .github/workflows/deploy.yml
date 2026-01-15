@@ -31,7 +31,7 @@ jobs:
           port: 22
           script: |
             # Go to k8s folder
-            cd /k8s
+            cd /home/ubuntu/k8s
 
             # Update frontend deployment image with tag from build workflow
             sed -i "s#image: siddhartha54/yt-frontend:.*#image: siddhartha54/yt-frontend:${FRONTEND_TAG}#g" frontend-deployment.yaml
