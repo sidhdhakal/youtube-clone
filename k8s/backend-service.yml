@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend-service
+  name: localhost:5000
   namespace: yt
 spec:
   selector:
     app: yt-backend
   ports:
     - protocol: TCP
-      port: 5000 
-      targetPort: 5000 
-  type: ClusterIP 
+      port: 5000
+      targetPort: 5000
+  type: ClusterIP

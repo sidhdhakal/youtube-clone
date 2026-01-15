@@ -1,54 +1,55 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { api } from '../services/api'
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { api } from "../services/api";
 
-export default function Upload(){
+export default function Upload() {
   const navigate = useNavigate();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [url, setUrl] = useState('');
-  const [thumbnailUrl, setThumbnailUrl] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [url, setUrl] = useState("");
+  const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
-    
+    const token = localStorage.getItem("token");
+
     if (!token) {
-      setError('You must be logged in to upload');
+      setError("You must be logged in to upload");
       return;
     }
 
     if (!title || !url) {
-      setError('Title and URL are required');
+      setError("Title and URL are required");
       return;
     }
 
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const res = await fetch('http://localhost:5000/api/videos', {
-        method: 'POST',
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/videos`, {
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           title,
           description,
           url,
-          thumbnailUrl: thumbnailUrl || 'https://placehold.co/640x360?text=Video+Thumbnail',
-          channelName: localStorage.getItem('username') || 'Anonymous'
-        })
+          thumbnailUrl:
+            thumbnailUrl || "https://placehold.co/640x360?text=Video+Thumbnail",
+          channelName: localStorage.getItem("username") || "Anonymous",
+        }),
       });
 
-      if (!res.ok) throw new Error('Failed to upload video');
-      
+      if (!res.ok) throw new Error("Failed to upload video");
+
       const data = await res.json();
-      alert('Video uploaded successfully!');
-      navigate('/');
+      alert("Video uploaded successfully!");
+      navigate("/");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -59,7 +60,9 @@ export default function Upload(){
   return (
     <div className="bg-white dark:bg-gray-950 min-h-screen">
       <div className="max-w-2xl mx-auto px-4 py-12">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Upload Video</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
+          Upload Video
+        </h1>
 
         {error && (
           <div className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-200 px-4 py-3 rounded mb-6">
@@ -67,8 +70,10 @@ export default function Upload(){
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6 bg-gray-50 dark:bg-gray-900 p-6 rounded-lg border border-gray-200 dark:border-gray-800">
-          
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6 bg-gray-50 dark:bg-gray-900 p-6 rounded-lg border border-gray-200 dark:border-gray-800"
+        >
           {/* Title */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
@@ -139,7 +144,11 @@ export default function Upload(){
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 Preview
               </label>
-              <img src={thumbnailUrl} alt="Thumbnail preview" className="w-full h-40 object-cover rounded-lg" />
+              <img
+                src={thumbnailUrl}
+                alt="Thumbnail preview"
+                className="w-full h-40 object-cover rounded-lg"
+              />
             </div>
           )}
 
@@ -149,21 +158,25 @@ export default function Upload(){
             disabled={loading}
             className="w-full px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Uploading...' : 'Upload Video'}
+            {loading ? "Uploading..." : "Upload Video"}
           </button>
         </form>
 
         {/* Tips */}
         <div className="mt-8 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-          <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">💡 Tips</h3>
+          <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">
+            💡 Tips
+          </h3>
           <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
             <li>• Use direct video URLs (must be publicly accessible)</li>
             <li>• Supported formats: MP4, WebM, Ogg</li>
             <li>• Thumbnail should be 640x360 or similar aspect ratio</li>
-            <li>• You can use free image services like placehold.co for testing</li>
+            <li>
+              • You can use free image services like placehold.co for testing
+            </li>
           </ul>
         </div>
       </div>
     </div>
-  )
+  );
 }
