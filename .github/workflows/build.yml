@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-and-push:
+  build-and-pushs:
     runs-on: ubuntu-latest
     outputs:
       frontend_tag: ${{ steps.set-tags.outputs.frontend }}
