@@ -8,10 +8,6 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    outputs:
-      frontend_tag: ${{ steps.set-tags.outputs.frontend }}
-      backend_tag: ${{ steps.set-tags.outputs.backend }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -25,21 +21,32 @@ jobs:
       - name: Generate Docker Tags
         id: set-tags
         run: |
-          FRONTEND_TAG=v.$(shuf -i 10-99 -n 1)
-          BACKEND_TAG=v.$(shuf -i 10-99 -n 1)
-          echo "frontend=$FRONTEND_TAG" >> $GITHUB_OUTPUT
-          echo "backend=$BACKEND_TAG" >> $GITHUB_OUTPUT
-          echo "Frontend tag: $FRONTEND_TAG"
-          echo "Backend tag: $BACKEND_TAG"
+          # Use run_number to ensure unique, increasing versions
+          FRONTEND_TAG="v.${{ github.run_number }}"
+          BACKEND_TAG="v.${{ github.run_number }}"
+          echo "FRONTEND_TAG=$FRONTEND_TAG" >> $GITHUB_ENV
+          echo "BACKEND_TAG=$BACKEND_TAG" >> $GITHUB_ENV
+          
+          # Save tags to a file to pass to the next workflow
+          echo "$FRONTEND_TAG" > frontend_tag.txt
+          echo "$BACKEND_TAG" > backend_tag.txt
 
       - name: Build & Push Frontend Image
         working-directory: frontend
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/yt-frontend:${{ steps.set-tags.outputs.frontend }} .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/yt-frontend:${{ steps.set-tags.outputs.frontend }}
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/yt-frontend:${{ env.FRONTEND_TAG }} .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/yt-frontend:${{ env.FRONTEND_TAG }}
 
       - name: Build & Push Backend Image
         working-directory: backend
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/yt-backend:${{ steps.set-tags.outputs.backend }} .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/yt-backend:${{ steps.set-tags.outputs.backend }}
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/yt-backend:${{ env.BACKEND_TAG }} .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/yt-backend:${{ env.BACKEND_TAG }}
+
+      - name: Upload Tags as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-tags
+          path: |
+            frontend_tag.txt
+            backend_tag.txt
