@@ -34,10 +34,10 @@ jobs:
             cd /home/ubuntu/k8s
 
             # Update frontend deployment image with tag from build workflow
-            sed -i "s#image: siddhartha54/yt-frontend:.*#image: siddhartha54/yt-frontend:${FRONTEND_TAG}#g" frontend-deployment.yaml
+            sed -i "s#image: siddhartha54/yt-frontend:.*#image: siddhartha54/yt-frontend:${FRONTEND_TAG}#g" frontend-deployment.yml
 
             # Update backend deployment image with tag from build workflow
-            sed -i "s#image: siddhartha54/yt-backend:.*#image: siddhartha54/yt-backend:${BACKEND_TAG}#g" backend-deployment.yaml
+            sed -i "s#image: siddhartha54/yt-backend:.*#image: siddhartha54/yt-backend:${BACKEND_TAG}#g" backend-deployment.yml
 
             # Apply all manifests
             kubectl apply -f .
